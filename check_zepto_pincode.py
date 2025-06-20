@@ -17,10 +17,7 @@ driver = webdriver.Remote("http://127.0.0.1:4723", desired_caps)
 driver.implicitly_wait(10)
 
 # Step 1: Open change address screen
-try:
-    change_button = driver.find_element(AppiumBy.ID, "com.zeptoconsumerapp:id/eta-address-details")
-except:
-    change_button = driver.find_element(AppiumBy.ID, "com.zeptoconsumerapp:id/select-your-location-manually")
+change_button = driver.find_element(AppiumBy.ID, "com.zeptoconsumerapp:id/select-your-location-manually")
 change_button.click()
 
 # Step 2: Enter pincode
