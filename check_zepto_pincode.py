@@ -13,7 +13,7 @@ desired_caps = {
 }
 
 # Connect to Appium
-driver = webdriver.Remote("http://127.0.0.1:4723/wd/hub", desired_caps)
+driver = webdriver.Remote("http://127.0.0.1:4723", desired_caps)
 driver.implicitly_wait(10)
 
 # Step 1: Open change address screen
