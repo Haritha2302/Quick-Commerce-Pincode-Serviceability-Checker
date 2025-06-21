@@ -1,133 +1,111 @@
-Absolutely! Here's a clean, beginner-friendly `README.md` file you can include with the script:
+# 🧾 Pincode Serviceability Checker
+
+Check whether a list of Indian pincodes is serviceable on **Zepto** and **Blinkit** using automated browser checks via Selenium.
 
 ---
 
-# 🧾 Zepto Pincode Serviceability Checker
+## 🚀 Features
 
-This script automates checking whether specific pincodes are serviceable by **Zepto** (India-based grocery delivery app), using **Selenium** and **ChromeDriver**. It's designed to scale across platforms — Blinkit, Instamart, BigBasket, Flipkart Minutes, and Amazon Fresh — with future updates.
+* Accepts CSV input with a list of pincodes
+* Validates and filters incorrect pincodes
+* Checks:
+
+  * **Zepto** by entering the pincode, selecting a matching address, and detecting serviceability via presence of a **"Sit Tight! We’re Coming Soon!"** message
+  * **Blinkit** by entering the pincode and selecting the address, and checking for a non-serviceable element
+* Outputs:
+
+  * `serviceability_results.csv` – status for each pincode
+  * `invalid_pincodes.csv` – any entries that were invalid
 
 ---
 
-## 📦 What It Does
+## 🗂 Input Format
 
-* ✅ Reads a list of **pincodes** from a CSV file (`pincodes.csv`)
-* ✅ Skips invalid pincodes (non-6-digit or malformed)
-* ✅ Opens [ZeptoNow.com](https://www.zeptonow.com) in a browser
-* ✅ Enters each valid pincode and captures whether the area is **serviceable**
-* ✅ Saves:
+Create a CSV named `pincodes.csv` in the same folder:
 
-  * A consolidated CSV report with serviceability status (`pincode_serviceability.csv`)
-  * A separate list of invalid pincodes (`invalid_pincodes.csv`)
+```
+562110
+500032
+123456
+notapincode
+```
+
+Only 6-digit numeric entries will be processed.
+
+---
+
+## 🧪 Output Files
+
+* `serviceability_results.csv`
+
+  | Pincode | Address        | Zepto       | Blinkit         |
+  | ------- | -------------- | ----------- | --------------- |
+  | 562110  | Devanahalli... | Serviceable | Not Serviceable |
+
+* `invalid_pincodes.csv`
+  List of skipped/invalid pincodes.
 
 ---
 
 ## 🧰 Requirements
 
-You’ll need **Python 3**, **Google Chrome**, and the following Python packages:
+* Python 3.7+
+* Chrome browser installed
+* [ChromeDriver](https://sites.google.com/chromium.org/driver/) matching your Chrome version
+* Python packages:
 
-### 1. Install Python packages
+  ```bash
+  pip install selenium
+  ```
+
+---
+
+## 🧾 Usage
 
 ```bash
-pip install selenium
+python3 check_serviceability.py
 ```
 
-### 2. Install ChromeDriver
-
-Ensure **ChromeDriver** matches your installed version of Chrome:
-
-* Check your Chrome version:
-  `chrome://settings/help`
-
-* Download matching ChromeDriver:
-  [https://sites.google.com/chromium.org/driver/](https://sites.google.com/chromium.org/driver/)
-
-* Place the `chromedriver` in your system path or same folder as this script
+* Chrome will open automatically for each pincode and check both services one by one.
+* Browser is maximized for visibility (not headless).
 
 ---
 
-## 📂 Input & Output Files
+## 🔍 How Serviceability is Detected
 
-### ✅ Input: `pincodes.csv`
+### Zepto
 
-CSV file **with a `pincode` column**:
+* Pincode is entered in the location search box.
+* First result is selected.
+* **Confirm & Continue** is clicked.
+* If a message containing **"Sit Tight! We’re Coming Soon!"** is found, the pincode is **Not Serviceable**.
+* Otherwise, marked as **Serviceable**.
 
-```csv
-pincode
-560001
-110011
-999999
-...
-```
+### Blinkit
 
-### 📤 Output: `pincode_serviceability.csv`
-
-CSV with results from Zepto (and placeholders for other platforms):
-
-```csv
-pincode,address,zepto,blinkit,instamart,bigbasket,flipkart,amazon
-560001,"Shanthala Nagar, Bengaluru",Serviceable,,,,,
-999999,"Bhavnagar Para, Bhavnagar",Not Serviceable,,,,,
-...
-```
-
-### ⚠️ Output: `invalid_pincodes.csv`
-
-CSV listing invalid or skipped pincodes (e.g., too short, too long, not numeric):
-
-```csv
-pincode
-5600301
-abcd12
-...
-```
+* Pincode is entered in the location popup.
+* First matching result is clicked.
+* If a **non-serviceable element** is detected, it's **Not Serviceable**.
+* Otherwise, **Serviceable**.
 
 ---
 
-## ▶️ How to Run
+## 🧪 Debugging Tips
 
-### 1. Add your pincodes to `pincodes.csv`
+* If Zepto fails:
 
-Make sure there is a `pincode` column. Example:
+  * Ensure popups or location permissions aren’t blocking input.
+  * You can add `print()` statements inside `check_zepto()` to trace.
+* If Blinkit fails:
 
-```csv
-pincode
-560001
-682306
-999999
-```
-
-### 2. Run the script
-
-```bash
-python3 pincode_serviceability_check.py
-```
-
-Chrome will open automatically and begin checking each pincode.
+  * Check that address container loads – add waits if needed.
 
 ---
 
-## 📌 Notes
+## ✅ To Do / Improvements
 
-* The script waits \~2 seconds between each pincode to reduce load and avoid rate limits.
-* If Zepto layout changes, selector updates may be needed.
-* This version only implements **Zepto**; other platforms can be added by extending the result dictionary.
-
----
-
-## 📥 Next Steps
-
-Want to check more platforms?
-
-You're set up to expand this file to also check:
-
-* Blinkit
-* Instamart
-* BigBasket
-* Amazon Fresh
-* Flipkart Minutes
-
-Add functions like `check_blinkit_pincode_serviceability()` and update each row accordingly.
+* Add retry on timeout or click failures
+* Add support for more services
+* Optional: Run headless for faster batch processing
 
 ---
-
-Let me know if you'd like a logo, badges (Python version, Selenium, etc.), or platform stubs added.
