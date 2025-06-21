@@ -10,7 +10,7 @@ Check whether a list of Indian pincodes is serviceable on **Zepto** and **Blinki
 * Validates and filters incorrect pincodes
 * Checks:
 
-  * **Zepto** by entering the pincode, selecting a matching address, and detecting serviceability via presence of a **"Sit Tight! We’re Coming Soon!"** message
+  * **Zepto** by entering the pincode, selecting a matching address, and detecting serviceability via presence of a **"Coming Soon!"** message
   * **Blinkit** by entering the pincode and selecting the address, and checking for a non-serviceable element
 * Outputs:
 
