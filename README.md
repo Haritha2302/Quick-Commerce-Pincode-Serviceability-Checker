@@ -1,111 +1,112 @@
-# 🧾 Pincode Serviceability Checker
+# 🧭 Pincode Serviceability Checker
 
-Check whether a list of Indian pincodes is serviceable on **Zepto** and **Blinkit** using automated browser checks via Selenium.
+This tool automates serviceability checks for Indian grocery delivery platforms — **Zepto**, **Blinkit**, and **Instamart (Swiggy)** — using Selenium.
 
----
-
-## 🚀 Features
-
-* Accepts CSV input with a list of pincodes
-* Validates and filters incorrect pincodes
-* Checks:
-
-  * **Zepto** by entering the pincode, selecting a matching address, and detecting serviceability via presence of a **"Coming Soon!"** message
-  * **Blinkit** by entering the pincode and selecting the address, and checking for a non-serviceable element
-* Outputs:
-
-  * `serviceability_results.csv` – status for each pincode
-  * `invalid_pincodes.csv` – any entries that were invalid
+It reads a list of Indian pincodes from a CSV file and returns whether grocery delivery is supported on each platform, along with the detected address (if available).
 
 ---
 
-## 🗂 Input Format
+## 📦 What It Does
 
-Create a CSV named `pincodes.csv` in the same folder:
+- Validates each input pincode.
+- Checks service availability across:
+  - 🛒 Zepto (`https://www.zeptonow.com`)
+  - ⚡ Blinkit (`https://www.blinkit.com`)
+  - 🥫 Instamart (via `https://www.swiggy.com`)
+- Captures:
+  - Serviceability status: `Serviceable`, `Not Serviceable`, `Invalid or No Match`, `Error`, `Unconfirmed`
+  - Displayed address for each successful match
+- Outputs results in CSV files.
+
+---
+
+## 🛠️ How to Run
+
+### 1. 📥 Prepare Input
+
+Create a file named `pincodes.csv` with one pincode per line:
 
 ```
-562110
+682306
 500032
-123456
-notapincode
+A77H90
 ```
 
-Only 6-digit numeric entries will be processed.
+There is a file titled 'pincodes.csv' in this project you can use to test.
+Only valid 6-digit numeric pincodes will be processed.
 
----
+### 2. 🧪 Set Up Environment
 
-## 🧪 Output Files
+Make sure you have:
 
-* `serviceability_results.csv`
+- Python 3.x
+- Google Chrome installed
+- Compatible [ChromeDriver](https://sites.google.com/chromium.org/driver/) added to your system PATH
 
-  | Pincode | Address        | Zepto       | Blinkit         |
-  | ------- | -------------- | ----------- | --------------- |
-  | 562110  | Devanahalli... | Serviceable | Not Serviceable |
-
-* `invalid_pincodes.csv`
-  List of skipped/invalid pincodes.
-
----
-
-## 🧰 Requirements
-
-* Python 3.7+
-* Chrome browser installed
-* [ChromeDriver](https://sites.google.com/chromium.org/driver/) matching your Chrome version
-* Python packages:
-
-  ```bash
-  pip install selenium
-  ```
-
----
-
-## 🧾 Usage
+Install required Python libraries:
 
 ```bash
-python3 check_serviceability.py
+pip install -r requirements.txt
 ```
 
-* Chrome will open automatically for each pincode and check both services one by one.
-* Browser is maximized for visibility (not headless).
+### 3. 🚀 Run the Script
+
+```bash
+python3 pincode_serviceability_check.py
+```
+
+### 4. 📁 Output
+
+- `serviceability_results.csv` — main results with status and address
+- `invalid_pincodes.csv` — list of invalid or malformed pincodes
 
 ---
 
-## 🔍 How Serviceability is Detected
+## 📌 Why Some Design Decisions Were Made
 
-### Zepto
+### 🔁 Separate Browser Sessions for Each Check
 
-* Pincode is entered in the location search box.
-* First result is selected.
-* **Confirm & Continue** is clicked.
-* If a message containing **"Sit Tight! We’re Coming Soon!"** is found, the pincode is **Not Serviceable**.
-* Otherwise, marked as **Serviceable**.
+Instamart (Swiggy) changes the page context based on address selection — sometimes redirecting to `/restaurants`. Reloading doesn't reset this reliably, so we restart the browser for each platform to ensure test consistency and clean sessions.
 
-### Blinkit
+### ⚠️ “Unconfirmed” Status for Instamart
 
-* Pincode is entered in the location popup.
-* First matching result is clicked.
-* If a **non-serviceable element** is detected, it's **Not Serviceable**.
-* Otherwise, **Serviceable**.
+Swiggy’s UX doesn't always make serviceability clear. If no banners or known error messages appear, the status is marked `Unconfirmed` as a fallback.
 
 ---
 
-## 🧪 Debugging Tips
+## 📥 Inputs
 
-* If Zepto fails:
-
-  * Ensure popups or location permissions aren’t blocking input.
-  * You can add `print()` statements inside `check_zepto()` to trace.
-* If Blinkit fails:
-
-  * Check that address container loads – add waits if needed.
+- `pincodes.csv` — required input file with one pincode per line
 
 ---
 
-## ✅ To Do / Improvements
+## 📤 Outputs
 
-* Add retry on timeout or click failures
-* Add support for more services
-* Optional: Run headless for faster batch processing
+| Column      | Description                              |
+|-------------|------------------------------------------|
+| Pincode     | 6-digit pincode checked                  |
+| Address     | Detected address (from any platform)     |
+| Zepto       | `Serviceable`, `Not Serviceable`, etc.   |
+| Blinkit     | Same as above                            |
+| Instamart   | Same as above                            |
 
 ---
+
+## 🧠 Notes
+
+- Script waits intelligently for page elements to appear.
+- Includes fallback handling for flaky or slow-loading pages.
+- Errors and skipped entries are handled gracefully with logging.
+
+---
+
+## 🧹 Troubleshooting
+
+- **StaleElementReferenceException**: Zepto is dynamic; we refetch elements to avoid this, but it may still occasionally occur. The retry mechanism helps reduce this risk.
+- **Blinkit/Instamart shows “Not Serviceable” even when known to work**: UI inconsistencies may cause false negatives — retrying or using a fresh session can help.
+
+---
+
+## 📃 License
+
+MIT License – free to use, modify, and share.
